@@ -1,0 +1,113 @@
+#!/bin/bash
+
+#set -x
+
+MEMO_FOLDER=~/memo
+
+
+# functions
+
+function preconditions_memo(){
+    mkdir -p ${MEMO_FOLDER}
+}
+
+function create_memo(){
+    memo_name=$1
+    shift
+    text=$@
+
+    memo_path=${MEMO_FOLDER}/${memo_name}
+
+    if [[ -d ${memo_path} ]]
+    then
+        echo "append to ${memo_name}"
+        cat >>${memo_path}/memo.md <<EOF
+
+${text}
+EOF
+    else
+        echo "create ${memo_name}"
+        mkdir -p ${memo_path}
+        cat >${memo_path}/memo.md <<EOF
+# ${memo_name}
+
+${text}
+EOF
+    fi
+}
+
+function append_memo(){
+    memo_name=$1
+    shift
+    path=$@
+
+    memo_path=${MEMO_FOLDER}/${memo_name}
+
+    if [[ ! -d ${memo_path} ]]
+    then
+        create_memo ${memo_name} "init"
+    fi
+
+    echo "append '${path}' to memo '${memo_name}'"
+    cp -r "${path}" ${memo_path}/
+
+}
+
+function search_term(){
+    search_terms=$@
+
+    cd ${MEMO_FOLDER}
+    ack "${search_terms}"
+}
+
+function help() {
+    cat <<EOF
+
+MeMo Tool:
+
+memo <command> arguments
+
+
+memo add <memo-title> [text]
+----------------------------------------------
+adds a memo.md in ${MEMO_FOLDER}/<memo-title>/
+containing the text
+
+
+memo append <memo-title> <file to add>
+--------------------------------------
+add a file to ${MEMO_FOLDER}/<memo-title>/
+
+
+memo search <term to search>
+----------------------------
+search for a term in
+${MEMO_FOLDER}/<memo-title>/
+
+EOF
+}
+
+
+
+
+#
+# main
+#
+
+command=$1
+shift
+
+preconditions_memo
+
+case $command in
+    add) create_memo $@
+         ;;
+    append)
+        append_memo $@
+        ;;
+    search)
+        search_term $@
+        ;;
+    *) help
+       ;;
+esac
