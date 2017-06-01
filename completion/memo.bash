@@ -3,13 +3,14 @@
 _memo(){
     local cur opt prev
 
+    MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
+    opts="add copy search show list"
+
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
 
     case ${COMP_CWORD} in
         1)
-            opts="add append search"
-
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}" ) )
             return 0
             ;;
@@ -20,8 +21,7 @@ _memo(){
                     return 1
                     ;;
                 *)
-
-                    entries=$( ls ~/memo )
+                    entries=$( ls ${MEMO_FOLDER} )
                     COMPREPLY=( $(compgen -W "${entries}" -- "${cur}" ) )
                     return 0
                     ;;
@@ -30,7 +30,7 @@ _memo(){
         3)
             operatior="${COMP_WORDS[COMP_CWORD-2]}"
             case ${operatior} in
-                append)
+                copy)
                     COMPREPLY=( $(compgen -f "${cur}" ) )
                     return 0
                     ;;
