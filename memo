@@ -1,0 +1,221 @@
+#!/bin/bash
+
+# Configuration
+#
+# Directory where to hold the memos
+# MEMO_DIR=~/memo
+
+# Script
+
+MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
+
+function precondition::provide_memo_folder(){
+    if [[ ! -d ${MEMO_FOLDER} ]]
+    then
+        echo "create memo folder : ${MEMO_FOLDER}"
+        mkdir -p ${MEMO_FOLDER}
+    fi
+}
+
+function precondition::provide_topic(){
+    topic_name=$1
+    topic_path=${MEMO_FOLDER}/${topic_name}
+
+    if [[ ! -d ${topic_path} ]]
+    then
+        echo "create memo topic : ${topic_name}"
+        mkdir -p ${topic_path}
+        echo "# ${topic_name}" > ${topic_path}/memo.md
+    fi
+}
+
+
+
+#
+# add command
+#
+
+function add_memo(){
+    topic_name=$1
+    shift
+    memo=$@
+
+    precondition::provide_topic ${topic_name}
+
+    topic_path=${MEMO_FOLDER}/${topic_name}
+    echo "append memo to ${topic_name}"
+    cat >>${topic_path}/memo.md <<EOF
+
+${memo}
+EOF
+}
+
+
+
+
+#
+# copy command
+#
+
+function copy_file(){
+    topic_name=$1
+    shift
+    path=$@
+
+    if [[ -z "${path}" ]]
+    then
+        show_help
+        echo
+        echo "!! path not given"
+        echo
+        exit 1
+    fi
+
+    if [[ ! -e "${path}" ]]
+    then
+        echo "path '${path}' does not exist"
+        exit 1
+    fi
+
+    precondition::provide_topic ${topic_name}
+
+    topic_path=${MEMO_FOLDER}/${topic_name}
+    echo "copy '${path}' to '${topic_name}'"
+    cp -r "${path}" ${topic_path}/
+
+}
+
+
+
+
+
+#
+# search command
+#
+
+function search_term(){
+    search_terms=$@
+
+    if [[ -z "${search_terms}" ]]
+    then
+        show_help
+        echo
+        echo "!! no search terms given"
+        echo
+        exit 1
+    fi
+
+    cd ${MEMO_FOLDER}
+    ack "${search_terms}"
+}
+
+
+
+#
+# show command
+#
+
+function show_topic(){
+    topic_name=$1
+    topic_path=${MEMO_FOLDER}/${topic_name}
+    topic_file=${topic_path}/memo.md
+
+    if [[ ! -d ${topic_path} ]]
+    then
+        echo "${topic_name} does not exist"
+        exit 1
+    fi
+
+    if [[ -f ${topic_file} ]]
+    then
+        echo
+        cat ${topic_file}
+        echo
+    fi
+
+    tree -a ${topic_path}
+}
+
+
+
+
+
+#
+# list command
+#
+
+function list_topics(){
+    echo
+    echo "topics : "
+    echo
+    tree -L 1 ${MEMO_FOLDER}
+}
+
+
+#
+# show help command
+#
+
+function show_help() {
+    cat <<EOF
+
+  /\/\   ___  /\/\   ___   /__   \___   ___   / /
+ /    \ / _ \/    \ / _ \    / /\/ _ \ / _ \ / /
+/ /\/\ \  __/ /\/\ \ (_) |  / / | (_) | (_) / /___
+\/    \/\___\/    \/\___/   \/   \___/ \___/\____/
+
+
+Usage:
+  memo <command> arguments
+
+Commands:
+  add <topic> [memo]
+    adds a memo.md in ${MEMO_FOLDER}/<topic>/
+    containing the text
+
+  copy <topic> <file to copy>
+    copy a file to ${MEMO_FOLDER}/<topic>/
+
+  search <term to search>
+    search for a term in
+    ${MEMO_FOLDER}/<memo-title>/
+
+  show <topic>
+    show topic file and list all file in the
+    ${MEMO_FOLDER}/<topic>/
+
+  list
+    prints a list of all topics
+
+EOF
+}
+
+
+
+#
+# main
+#
+
+command=$1
+shift
+
+precondition::provide_memo_folder
+
+case $command in
+    add) add_memo $@
+         ;;
+    copy)
+        copy_file $@
+        ;;
+    search)
+        search_term $@
+        ;;
+    show)
+        show_topic $@
+        ;;
+    list)
+        list_topics
+        ;;
+    *) show_help
+       ;;
+esac
