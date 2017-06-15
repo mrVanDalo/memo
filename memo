@@ -37,17 +37,24 @@ function precondition::provide_topic(){
 
 function add_memo(){
     topic_name=$1
-    shift
-    memo=$@
-
     precondition::provide_topic ${topic_name}
-
     topic_path=${MEMO_FOLDER}/${topic_name}
-    echo "append memo to ${topic_name}"
-    cat >>${topic_path}/memo.md <<EOF
+
+    shift
+    if [[ $# -gt 0 ]]
+    then
+        memo=$@
+        echo "append memo to ${topic_name}"
+        cat >>${topic_path}/memo.md <<EOF
 
 ${memo}
 EOF
+    else
+        echo "append input to ${topic_name}"
+        echo "" >>${topic_path}/memo.md
+        cat >>${topic_path}/memo.md -
+    fi
+
 }
 
 
@@ -172,6 +179,9 @@ Commands:
   add <topic> [memo]
     adds a memo.md in ${MEMO_FOLDER}/<topic>/
     containing the text
+    if memo is not given it will read from input
+    so piping is possible.
+    Example: cat file.txt | memo add topic
 
   copy <topic> <file to copy>
     copy a file to ${MEMO_FOLDER}/<topic>/
