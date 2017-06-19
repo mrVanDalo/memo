@@ -1,11 +1,14 @@
 # memo
 
-A simple memo tool written in bash.
+A simple tool written in bash to memorize stuff.
 
-Memo are organized in topic which are folders in `~/memo`
+Memo organizes is structured through topics which are folders in `~/memo`.
 
-You can copy file to you topic and you can search across all your
-topics.
+## Features
+
+* add text to a topic to memorize it
+* search for strings in your memo-database
+* copy/import files to topic folder.
 
 ## Run
 
@@ -22,10 +25,8 @@ topics.
 
 ## Configuration
 
-to change the folder where the memo files are kept just add
+to change the folder where memo kept its files just add
 
     export MEMO_DIR=/path/to/memo/folder
 
 in your `~/.bashrc`.
-
-
