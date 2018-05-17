@@ -20,16 +20,36 @@ function precondition::provide_memo_folder(){
 function precondition::provide_topic(){
     topic_name=$1
     topic_path=${MEMO_FOLDER}/${topic_name}
+    topic_file=${topic_path}/memo.md
 
     if [[ ! -d ${topic_path} ]]
     then
         echo "create memo topic : ${topic_name}"
         mkdir -p ${topic_path}
-        echo "# ${topic_name}" > ${topic_path}/memo.md
+        echo "# Memo" > ${topic_file}
     fi
 }
 
 
+
+#
+# edit command
+#
+
+function edit_memo() {
+    topic_name=$1
+    precondition::provide_topic ${topic_name}
+    topic_path=${MEMO_FOLDER}/${topic_name}
+
+    if [[ -z ${EDITOR} ]]
+    then
+      echo "you have to define the ${EDITOR} variable"
+      exit 1
+    fi
+
+    ${EDITOR} ${topic_file}
+
+}
 
 #
 # add command
@@ -39,20 +59,21 @@ function add_memo(){
     topic_name=$1
     precondition::provide_topic ${topic_name}
     topic_path=${MEMO_FOLDER}/${topic_name}
+    topic_file=${topic_path}/memo.md
 
     shift
     if [[ $# -gt 0 ]]
     then
         memo=$@
         echo "append memo to ${topic_name}"
-        cat >>${topic_path}/memo.md <<EOF
+        cat >>${topic_file} <<EOF
 
 ${memo}
 EOF
     else
         echo "append input to ${topic_name}"
-        echo "" >>${topic_path}/memo.md
-        cat >>${topic_path}/memo.md -
+        echo "" >>${topic_file}
+        cat >>${topic_file} -
     fi
 
 }
@@ -136,11 +157,22 @@ function show_topic(){
     if [[ -f ${topic_file} ]]
     then
         echo
-        cat ${topic_file}
+        #cat ${topic_file}
+        cat <(
+            echo "% ${topic_name}" && \
+            echo "% $( whoami )" && \
+            echo "% $( date +%Y-%m-%d )" && \
+            cat ${topic_file} && \
+            echo && \
+            echo "# Folders" && \
+            echo && \
+            find ${topic_path} -printf "* %p\n") | \
+            pandoc - -s -t man | \
+            man -l -
         echo
     fi
 
-    tree -a ${topic_path}
+    # tree -a ${topic_path}
 }
 
 
@@ -194,6 +226,9 @@ Commands:
     show topic file and list all file in the
     ${MEMO_FOLDER}/<topic>/
 
+  edit <topic>
+    edit topic ${MEMO_FOLDER}/<topic>.md
+
   list
     prints a list of all topics
 
@@ -222,6 +257,9 @@ case $command in
         ;;
     show)
         show_topic $@
+        ;;
+    edit)
+        edit_memo $@
         ;;
     list)
         list_topics

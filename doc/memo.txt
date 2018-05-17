@@ -24,13 +24,18 @@ COMMANDS
   show <topic>    shows memo.md in the topic folder.
                   also showes a list of all files in the topic folder
 
+  edit <topic>    opens your favorite editor to edit the memo topic
+
   list            prints a list of all topics.
+
 
 
 CONFIGURATION
 
   $MEMO_DIR   holds the folder where to store the memo files.
-                Default is $HOME/memo
+              Default is $HOME/memo
+
+  $EDITOR     Your favorite editor. Must be set for the edit command
 
 EXAMPLE
 

@@ -22,6 +22,7 @@ Memo organizes is structured through topics which are folders in `~/memo`.
 ## Installation
 
 * Gentoo : use [my overlay](https://github.com/mrVanDalo/overlay) and install `app-misc/memo`
+* NixOs : just do `nix-shell -p memo`
 
 ## Configuration
 
