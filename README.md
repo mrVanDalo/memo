@@ -14,10 +14,12 @@ Memo organizes is structured through topics which are folders in `~/memo`.
 
 `./memo` shows how to use it
 
-### Preconditions
+### Dependencies
 
 * tree
 * ack
+* man
+* pandoc
 
 ## Installation
 
