@@ -5,6 +5,12 @@
 # Directory where to hold the memos
 # MEMO_DIR=~/memo
 
+# commands
+tree_cmd=tree
+pandoc_cmd=pandoc
+ack_cmd=ack
+man_cmd=man
+
 # Script
 
 MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
@@ -134,7 +140,7 @@ function search_term(){
     fi
 
     cd ${MEMO_FOLDER}
-    ack "${search_terms}"
+    ${ack_cmd} "${search_terms}"
 }
 
 
@@ -167,12 +173,10 @@ function show_topic(){
             echo "# Folders" && \
             echo && \
             find ${topic_path} -printf "* %p\n") | \
-            pandoc - -s -t man | \
-            man -l -
+            ${pandoc_cmd} - -s -t man | \
+            ${man_cmd} -l -
         echo
     fi
-
-    # tree -a ${topic_path}
 }
 
 
@@ -187,7 +191,7 @@ function list_topics(){
     echo
     echo "topics : "
     echo
-    tree -L 1 ${MEMO_FOLDER}
+    ${tree_cmd} -L 1 ${MEMO_FOLDER}
 }
 
 
