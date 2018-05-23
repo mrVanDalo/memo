@@ -6,10 +6,11 @@
 # MEMO_DIR=~/memo
 
 # commands
-tree_cmd=tree
-pandoc_cmd=pandoc
 ack_cmd=ack
 man_cmd=man
+tree_cmd=tree
+# comment pandoc_cmd to fall back to cat
+pandoc_cmd=pandoc
 
 # Script
 
@@ -163,7 +164,11 @@ function show_topic(){
     if [[ -f ${topic_file} ]]
     then
         echo
-        #cat ${topic_file}
+        if [[ -z ${pandoc_cmd} ]]
+        then
+            cat ${topic_file}
+            echo
+        else
         cat <(
             echo "% ${topic_name}" && \
             echo "% $( whoami )" && \
@@ -175,7 +180,7 @@ function show_topic(){
             find ${topic_path} -printf "* %p\n") | \
             ${pandoc_cmd} - -s -t man | \
             ${man_cmd} -l -
-        echo
+        fi
     fi
 }
 
