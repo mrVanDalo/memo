@@ -1,0 +1,33 @@
+#compdef memo
+#autoload
+
+function _memo {
+  local line
+
+  _arguments \
+    "1:action:((
+      add\:'add a text to a topic'
+      copy\:'copy a file to a topic'
+      search\:'search for text in all topics'
+      show\:'show a topic'
+      edit\:'edit a topic'
+      list\:'print a list of all topics'
+    ))" \
+    "*::arg:->args"
+
+  case $line[1] in
+    add|copy|show|edit)
+      _memo_topics
+      ;;
+    *)
+      ;;
+  esac
+
+}
+
+function _memo_topics {
+  MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
+  topics=($(ls ${MEMO_FOLDER}))
+  compadd -X "A vailable Topics" $topics
+}
+
