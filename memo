@@ -9,8 +9,10 @@
 ack_cmd=ack
 man_cmd=man
 tree_cmd=tree
+git_cmd=git
 # comment pandoc_cmd to fall back to cat
 pandoc_cmd=pandoc
+
 
 # Script
 
@@ -37,13 +39,72 @@ function precondition::provide_topic(){
     fi
 }
 
+#
+# git commands
+#
 
+IS_GIT_REPO=0
+# check if it is a gitrepository
+# use the IS_GIT_REPO variable to
+# verify later if it is a git repo
+function git:status(){
+  cd ${MEMO_FOLDER}
+  ${git_cmd} status &> /dev/null
+  if [[ $? -eq 0 ]]
+  then
+    IS_GIT_REPO=1
+  else
+    IS_GIT_REPO=0
+  fi
+}
+
+# run before commit
+function git:add_all_topics(){
+  if [[ ${IS_GIT_REPO} -eq 1 ]]
+  then
+    cd ${MEMO_FOLDER}
+    ${git_cmd} add .
+  fi
+}
+
+# make a commit
+function git:commit(){
+  local message="${1:-blind commit}"
+  if [[ ${IS_GIT_REPO} -eq 1 ]]
+  then
+    cd ${MEMO_FOLDER}
+    ${git_cmd} commit -m "${message}"
+  fi
+}
+
+function git:run_command(){
+  cd ${MEMO_FOLDER}
+  ${git_cmd} $@
+}
+
+#
+# remove command
+#
+
+function remove_topic (){
+    topic_name=$1
+    #precondition::provide_topic ${topic_name}
+    topic_path=${MEMO_FOLDER}/${topic_name}
+
+    if [[ -d ${topic_path} ]]
+    then
+        rm -rf ${topic_path}
+    fi
+
+    git:add_all_topics
+    git:commit "edit : ${topic_name}"
+}
 
 #
 # edit command
 #
 
-function edit_memo() {
+function edit_topic () {
     topic_name=$1
     precondition::provide_topic ${topic_name}
     topic_path=${MEMO_FOLDER}/${topic_name}
@@ -56,6 +117,8 @@ function edit_memo() {
 
     ${EDITOR} ${topic_file}
 
+    git:add_all_topics
+    git:commit "edit : ${topic_name}"
 }
 
 #
@@ -82,6 +145,9 @@ EOF
         echo "" >>${topic_file}
         cat >>${topic_file} -
     fi
+
+    git:add_all_topics
+    git:commit "add : ${topic_name}"
 
 }
 
@@ -117,6 +183,9 @@ function copy_file(){
     topic_path=${MEMO_FOLDER}/${topic_name}
     echo "copy '${path}' to '${topic_name}'"
     cp -r "${path}" ${topic_path}/
+
+    git:add_all_topics
+    git:commit "copy $( dirname ${path} ): ${topic_name}"
 
 }
 
@@ -224,6 +293,9 @@ Commands:
     so piping is possible.
     Example: cat file.txt | memo add topic
 
+  rm <topic>
+    remove ${MEMO_FOLDER}/<topic> (with all its content)
+
   copy <topic> <file to copy>
     copy a file to ${MEMO_FOLDER}/<topic>/
 
@@ -241,6 +313,9 @@ Commands:
   list
     prints a list of all topics
 
+  git <command>
+    run git <command> in ${MEMO_FOLDER}
+
 EOF
 }
 
@@ -254,6 +329,7 @@ command=$1
 shift
 
 precondition::provide_memo_folder
+git:status
 
 case $command in
     add) add_memo $@
@@ -268,10 +344,16 @@ case $command in
         show_topic $@
         ;;
     edit)
-        edit_memo $@
+        edit_topic $@
         ;;
     list)
         list_topics
+        ;;
+    git)
+        git:run_command $@
+        ;;
+    rm)
+        remove_topic $@
         ;;
     *) show_help
        ;;

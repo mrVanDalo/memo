@@ -4,7 +4,7 @@ _memo(){
     local cur opt prev
 
     MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
-    opts="add copy search show list"
+    opts="add rm copy search show list"
 
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"

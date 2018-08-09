@@ -7,17 +7,22 @@ function _memo {
   _arguments \
     "1:action:((
       add\:'add a text to a topic'
+      rm\:'delete a topic folder with all its content'
       copy\:'copy a file to a topic'
       search\:'search for text in all topics'
       show\:'show a topic'
       edit\:'edit a topic'
       list\:'print a list of all topics'
+      git\:'run git command'
     ))" \
     "*::arg:->args"
 
   case $line[1] in
-    add|copy|show|edit)
+    add|rm|copy|show|edit)
       _memo_topics
+      ;;
+    git)
+      _git
       ;;
     *)
       ;;
@@ -29,5 +34,19 @@ function _memo_topics {
   MEMO_FOLDER="${MEMO_DIR:-$HOME/memo}"
   topics=($(ls ${MEMO_FOLDER}))
   compadd -X "A vailable Topics" $topics
+}
+
+function _git {
+  local -a subcommands
+  subcommands=(
+  "init:Initialize git repository"
+  "status:Status of git repository"
+  "push:Push to remote repository"
+  "pull:Pull from remote repository"
+  "config:Show git config"
+  "log:Show git log"
+  "reflog:Show git reflog"
+  )
+  _describe -t commands 'git' subcommands
 }
 

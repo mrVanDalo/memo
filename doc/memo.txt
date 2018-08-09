@@ -17,6 +17,8 @@ COMMANDS
   add <topic> [text]      adds text to the memo.md in the topic folder.
                           if text is not given it will read from stdin.
 
+  rm <topic>    remove $MEMO_DIR/topic folder with all it's content.
+
   copy <topic> <file-to-copy>     copy a file to the topic folder.
 
   search <term-to-search>         search for a term in $MEMO_DIR using ack.
@@ -27,6 +29,9 @@ COMMANDS
   edit <topic>    opens your favorite editor to edit the memo topic
 
   list            prints a list of all topics.
+
+  git <command>   run git command in $MEMO_DIR.
+                  Once $MEMO_DIR is a git repository all memo commands create commits.
 
 
 
@@ -53,6 +58,10 @@ EXAMPLE
   Copy the "Invoice.pdf" file to the "lawsuit" topic.
 
     $> memo copy lawsuit ~/Downloads/Invoice.pdf
+
+  Make $MEMO_DIR a git repository. 
+
+    $> memo git init
 
 
 
