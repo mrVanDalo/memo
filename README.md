@@ -7,8 +7,10 @@ Memo organizes is structured through topics which are folders in `~/memo`.
 ## Features
 
 * add text to a topic to memorize it
+* remote topics
 * search for strings in your memo-database
 * copy/import files to topic folder.
+* git support
 
 ## Run
 
@@ -19,7 +21,8 @@ Memo organizes is structured through topics which are folders in `~/memo`.
 * tree
 * ack
 * man
-* pandoc
+* git
+* pandoc (optional)
 
 ## Installation
 
