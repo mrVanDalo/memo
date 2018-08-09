@@ -7,6 +7,7 @@ function _memo {
   _arguments \
     "1:action:((
       add\:'add a text to a topic'
+      rm\:'delete a topic folder with all its content'
       copy\:'copy a file to a topic'
       search\:'search for text in all topics'
       show\:'show a topic'
@@ -17,7 +18,7 @@ function _memo {
     "*::arg:->args"
 
   case $line[1] in
-    add|copy|show|edit)
+    add|rm|copy|show|edit)
       _memo_topics
       ;;
     git)
