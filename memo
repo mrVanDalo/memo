@@ -77,16 +77,34 @@ function git:commit(){
   fi
 }
 
-function git:run_commands(){
+function git:run_command(){
   cd ${MEMO_FOLDER}
   ${git_cmd} $@
+}
+
+#
+# remove command
+#
+
+function remove_topic (){
+    topic_name=$1
+    #precondition::provide_topic ${topic_name}
+    topic_path=${MEMO_FOLDER}/${topic_name}
+
+    if [[ -d ${topic_path} ]]
+    then
+        rm -rf ${topic_path}
+    fi
+
+    git:add_all_topics
+    git:commit "edit : ${topic_name}"
 }
 
 #
 # edit command
 #
 
-function edit_memo() {
+function edit_topic () {
     topic_name=$1
     precondition::provide_topic ${topic_name}
     topic_path=${MEMO_FOLDER}/${topic_name}
@@ -275,6 +293,9 @@ Commands:
     so piping is possible.
     Example: cat file.txt | memo add topic
 
+  rm <topic>
+    remove ${MEMO_FOLDER}/<topic> (with all its content)
+
   copy <topic> <file to copy>
     copy a file to ${MEMO_FOLDER}/<topic>/
 
@@ -291,6 +312,9 @@ Commands:
 
   list
     prints a list of all topics
+
+  git <command>
+    run git <command> in ${MEMO_FOLDER}
 
 EOF
 }
@@ -320,13 +344,16 @@ case $command in
         show_topic $@
         ;;
     edit)
-        edit_memo $@
+        edit_topic $@
         ;;
     list)
         list_topics
         ;;
     git)
-        git:run_commands $@
+        git:run_command $@
+        ;;
+    rm)
+        remove_topic $@
         ;;
     *) show_help
        ;;
