@@ -1,6 +1,10 @@
-% memo
-%
-% 10 August 2018
+---
+title: memo
+date: 10 August 2018
+header: Linux Reference Manual
+footer: doc
+section: 1
+...
 
 # NAME
 memo
