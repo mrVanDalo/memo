@@ -106,6 +106,12 @@ function remove_topic (){
 
 function edit_topic () {
     topic_name=$1
+    if [[ -z $topic_name ]]
+    then
+        echo "you have to specify a topic"
+        exit 1
+    fi
+
     precondition:provide_topic ${topic_name}
     topic_path=${MEMO_FOLDER}/${topic_name}
 
